@@ -165,5 +165,12 @@ defmodule Ukio.ApartmentsTest do
       booking = booking_fixture()
       assert %Ecto.Changeset{} = Apartments.change_booking(booking)
     end
+
+     test "get_existing_booking returns existing booking" do
+      booking = booking_fixture()
+      apartment = apartment_fixture()
+      assert Apartments.get_existing_booking(apartment.id - 1,~D[2023-03-26],~D[2023-03-26]) == 1
+    end
+
   end
 end

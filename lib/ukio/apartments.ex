@@ -197,4 +197,31 @@ defmodule Ukio.Apartments do
   def change_booking(%Booking{} = booking, attrs \\ %{}) do
     Booking.changeset(booking, attrs)
   end
+
+  @doc """
+  Gets an existing booking that overlaps with the specified dates for a given apartment.
+
+  ## Examples
+
+      iex> get_existing_booking(apartment_id, check_in, check_out)
+      %Booking{} | nil
+
+  """
+  def get_existing_booking(apartment_id, check_in, check_out) do
+    query =
+      from(
+        b in Booking,
+        where: b.apartment_id == ^apartment_id and
+               (
+                 (b.check_in >= ^check_in and b.check_in < ^check_out) or
+                 (b.check_out > ^check_in and b.check_out <= ^check_out) or
+                 (b.check_in <= ^check_in and b.check_out >= ^check_out)
+               ),
+        select: b
+      )
+    
+    result = Repo.all(query)
+    IO.inspect({result})
+    length(result)
+  end
 end
