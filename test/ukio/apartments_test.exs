@@ -97,7 +97,8 @@ defmodule Ukio.ApartmentsTest do
       check_out: nil,
       deposit: nil,
       monthly_rent: nil,
-      utilities: nil
+      utilities: nil,
+      market: nil,
     }
     setup do
       %{apartment: apartment_fixture()}
@@ -120,7 +121,8 @@ defmodule Ukio.ApartmentsTest do
         check_out: ~D[2023-03-26],
         deposit: 100_000,
         monthly_rent: 250_000,
-        utilities: 20000
+        utilities: 20000,
+        market: "Earth"
       }
 
       assert {:ok, %Booking{} = booking} = Apartments.create_booking(valid_attrs)

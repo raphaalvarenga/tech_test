@@ -13,7 +13,7 @@ defmodule UkioWeb.BookingController do
       conn
       |> put_status(:created)
       |> render(:show, booking: booking)
-      
+
     :unavailable ->
       conn
       |> put_status(:unauthorized) 

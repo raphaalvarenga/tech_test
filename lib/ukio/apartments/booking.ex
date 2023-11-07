@@ -12,21 +12,22 @@ defmodule Ukio.Apartments.Booking do
     field :deposit, :integer
     field :monthly_rent, :integer
     field :utilities, :integer
-
+    field :market, :string
     timestamps()
   end
 
   @doc false
   def changeset(booking, attrs) do
     booking
-    |> cast(attrs, [:check_in, :check_out, :apartment_id, :monthly_rent, :deposit, :utilities])
+    |> cast(attrs, [:check_in, :check_out, :apartment_id, :monthly_rent, :deposit, :utilities, :market])
     |> validate_required([
       :check_in,
       :check_out,
       :apartment_id,
       :monthly_rent,
       :deposit,
-      :utilities
+      :utilities,
+      :market
     ])
   end
 end

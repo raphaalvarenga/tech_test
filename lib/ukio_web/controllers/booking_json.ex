@@ -23,7 +23,8 @@ defmodule UkioWeb.BookingJSON do
       apartment_id: booking.apartment_id,
       monthly_rent: booking.monthly_rent,
       deposit: booking.deposit,
-      utilities: booking.utilities
+      utilities: booking.utilities,
+      market: booking.market
     }
   end
 end

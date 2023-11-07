@@ -208,20 +208,24 @@ defmodule Ukio.Apartments do
 
   """
   def get_existing_booking(apartment_id, check_in, check_out) do
-    query =
-      from(
-        b in Booking,
-        where: b.apartment_id == ^apartment_id and
-               (
-                 (b.check_in >= ^check_in and b.check_in < ^check_out) or
-                 (b.check_out > ^check_in and b.check_out <= ^check_out) or
-                 (b.check_in <= ^check_in and b.check_out >= ^check_out)
-               ),
-        select: b
-      )
-    
-    result = Repo.all(query)
-    IO.inspect({result})
-    length(result)
+        if(is_nil(check_in) or is_nil(check_out))  do
+        -1
+      else
+       query =
+          from(
+            b in Booking,
+            where: b.apartment_id == ^apartment_id and
+                  (
+                    (b.check_in >= ^check_in and b.check_in < ^check_out) or
+                    (b.check_out > ^check_in and b.check_out <= ^check_out) or
+                    (b.check_in <= ^check_in and b.check_out >= ^check_out)
+                  ),
+            select: b
+          )
+        
+        result = Repo.all(query)
+        length(result)
+      end
   end
 end
+

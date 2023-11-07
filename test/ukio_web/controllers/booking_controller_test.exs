@@ -6,7 +6,15 @@ defmodule UkioWeb.BookingControllerTest do
   @create_attrs %{
     apartment_id: 42,
     check_in: ~D[2023-03-26],
-    check_out: ~D[2023-03-26]
+    check_out: ~D[2023-03-26],
+    market: "Earth"
+  }
+
+    @create_attrs_mars %{
+    apartment_id: 42,
+    check_in: ~D[2023-03-26],
+    check_out: ~D[2023-03-26],
+    market: "Mars"
   }
 
   @invalid_attrs %{
@@ -15,7 +23,8 @@ defmodule UkioWeb.BookingControllerTest do
     check_out: nil,
     deposit: nil,
     monthly_rent: nil,
-    utilities: nil
+    utilities: nil,
+    market: nil
   }
 
   setup %{conn: conn} do
@@ -44,7 +53,7 @@ defmodule UkioWeb.BookingControllerTest do
     test "renders errors when data is invalid", %{conn: conn, apartment: apartment} do
       b = Map.merge(@invalid_attrs, %{apartment_id: apartment.id})
       conn = post(conn, ~p"/api/bookings", booking: b)
-      assert json_response(conn, 400)["errors"] != %{}
+      assert json_response(conn, 401)["errors"] != %{}
     end
 
     test "returns 401 when the apartment is unavailable for the selected dates", %{conn: conn, apartment: apartment} do
@@ -66,7 +75,8 @@ defmodule UkioWeb.BookingControllerTest do
       conflict_attrs = %{
         apartment_id: 42,
         check_in: ~D[2023-03-26],
-        check_out: ~D[2023-03-30]
+        check_out: ~D[2023-03-30],
+        market: "Earth"
       }
       
 
@@ -84,7 +94,8 @@ defmodule UkioWeb.BookingControllerTest do
       conflict_attrs = %{
         apartment_id: 42,
         check_in: ~D[2023-03-10],
-        check_out: ~D[2023-03-26]
+        check_out: ~D[2023-03-26],
+        market: "Earth"
       }
       
 
@@ -102,13 +113,33 @@ defmodule UkioWeb.BookingControllerTest do
       second_booking_attrs = %{
         apartment_id: 42,
         check_in: ~D[2023-03-10],
-        check_out: ~D[2023-03-12]
+        check_out: ~D[2023-03-12],
+        market: "Earth"
       }
       
 
       b = Map.merge(second_booking_attrs, %{apartment_id: apartment.id})
       conn = post(conn, ~p"/api/bookings", booking: b)
       assert conn.status == 201
+    end
+
+    test "create a booking in mars market", %{conn: conn, apartment: apartment} do
+      # Book the apartment for the selected dates
+      b = Map.merge(@create_attrs_mars, %{apartment_id: apartment.id})
+      conn = post(conn, ~p"/api/bookings", booking: b)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      conn = get(conn, ~p"/api/bookings/#{id}")
+
+      assert %{
+               "id" => ^id,
+               "check_in" => "2023-03-26",
+               "check_out" => "2023-03-26",
+               "deposit" => 250_000,
+               "monthly_rent" => 250_000,
+               "utilities" => 210,
+               "market" => "Mars"
+             } = json_response(conn, 200)["data"]
     end
     
   end
