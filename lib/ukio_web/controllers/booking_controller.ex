@@ -7,7 +7,7 @@ defmodule UkioWeb.BookingController do
 
   action_fallback UkioWeb.FallbackController
 
-  def create(conn, %{"booking" => booking_params}) do
+def create(conn, %{"booking" => booking_params}) do
   case BookingCreator.create(booking_params) do
     {:ok, %Booking{} = booking} ->
       conn
@@ -18,6 +18,11 @@ defmodule UkioWeb.BookingController do
       conn
       |> put_status(:unauthorized) 
       |> json(%{error: "Booking is unavailable for the selected dates"})
+
+    :bad_request ->
+      conn
+      |> put_status(:bad_request)
+      |> json(%{error: "Invalid request"})
   end
 end
 

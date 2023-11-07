@@ -5,15 +5,15 @@ defmodule UkioWeb.BookingControllerTest do
 
   @create_attrs %{
     apartment_id: 42,
-    check_in: ~D[2023-03-26],
-    check_out: ~D[2023-03-26],
+    check_in: "2023-03-26",
+    check_out: "2023-03-26",
     market: "Earth"
   }
 
     @create_attrs_mars %{
     apartment_id: 42,
-    check_in: ~D[2023-03-26],
-    check_out: ~D[2023-03-26],
+    check_in: "2023-03-26",
+    check_out: "2023-03-26",
     market: "Mars"
   }
 
@@ -53,7 +53,7 @@ defmodule UkioWeb.BookingControllerTest do
     test "renders errors when data is invalid", %{conn: conn, apartment: apartment} do
       b = Map.merge(@invalid_attrs, %{apartment_id: apartment.id})
       conn = post(conn, ~p"/api/bookings", booking: b)
-      assert json_response(conn, 401)["errors"] != %{}
+      assert json_response(conn, 400)["errors"] != %{}
     end
 
     test "returns 401 when the apartment is unavailable for the selected dates", %{conn: conn, apartment: apartment} do
@@ -74,8 +74,8 @@ defmodule UkioWeb.BookingControllerTest do
 
       conflict_attrs = %{
         apartment_id: 42,
-        check_in: ~D[2023-03-26],
-        check_out: ~D[2023-03-30],
+        check_in:  "2023-03-26",
+        check_out: "2023-03-30",
         market: "Earth"
       }
       
@@ -93,8 +93,8 @@ defmodule UkioWeb.BookingControllerTest do
 
       conflict_attrs = %{
         apartment_id: 42,
-        check_in: ~D[2023-03-10],
-        check_out: ~D[2023-03-26],
+        check_in: "2023-03-10",
+        check_out: "2023-03-26",
         market: "Earth"
       }
       
@@ -112,8 +112,8 @@ defmodule UkioWeb.BookingControllerTest do
 
       second_booking_attrs = %{
         apartment_id: 42,
-        check_in: ~D[2023-03-10],
-        check_out: ~D[2023-03-12],
+        check_in: "2023-03-10",
+        check_out: "2023-03-12",
         market: "Earth"
       }
       

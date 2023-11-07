@@ -1,18 +1,27 @@
 defmodule Ukio.Bookings.Handlers.BookingCreator do
   alias Ukio.Apartments
 
-  def create(%{"check_in" => check_in, "check_out" => check_out, "apartment_id" => apartment_id, "market" => market} = params) do
+ def create(%{"check_in" => check_in, "check_out" => check_out, "apartment_id" => apartment_id, "market" => market} = params) do
+  try do
     case is_apartment_available(apartment_id, check_in, check_out) do
       :ok ->
         with a <- Apartments.get_apartment!(apartment_id),
-         b <- generate_booking_data(a, check_in, check_out, market) do
+             b <- generate_booking_data(a, check_in, check_out, market) do
           Apartments.create_booking(b)
         end
 
       :unavailable ->
         :unavailable
+     
+      :bad_request ->
+        :bad_request
     end
+  catch
+    :bad_request -> :bad_request
+    :unavailable -> :unavailable
+    _ -> :bad_request
   end
+end
 
 defp generate_booking_data(apartment, check_in, check_out, market) do
   case market do
@@ -42,8 +51,10 @@ end
   defp is_apartment_available(apartment_id, check_in, check_out) do
     existing_booking =
       Apartments.get_existing_booking(apartment_id, check_in, check_out)
+
     case existing_booking do
       0 -> :ok
+      -1 -> :bad_request
       _ -> :unavailable
     end
   end

@@ -207,25 +207,31 @@ defmodule Ukio.Apartments do
       %Booking{} | nil
 
   """
-  def get_existing_booking(apartment_id, check_in, check_out) do
-        if(is_nil(check_in) or is_nil(check_out))  do
-        -1
-      else
-       query =
-          from(
-            b in Booking,
-            where: b.apartment_id == ^apartment_id and
-                  (
-                    (b.check_in >= ^check_in and b.check_in < ^check_out) or
-                    (b.check_out > ^check_in and b.check_out <= ^check_out) or
-                    (b.check_in <= ^check_in and b.check_out >= ^check_out)
-                  ),
-            select: b
-          )
-        
-        result = Repo.all(query)
-        length(result)
+def get_existing_booking(apartment_id, check_in, check_out) do
+  case {check_in, check_out} do
+    {nil, _} -> -1
+    {_, nil} -> -1
+    {check_in, check_out} when is_binary(check_in) and is_binary(check_out) ->
+      case {Date.from_iso8601(check_in), Date.from_iso8601(check_out)} do
+        {{:ok, _}, {:ok, _}} ->
+          query =
+            from(
+              b in Booking,
+              where: b.apartment_id == ^apartment_id and
+                    (
+                      (b.check_in >= ^check_in and b.check_in < ^check_out) or
+                      (b.check_out > ^check_in and b.check_out <= ^check_out) or
+                      (b.check_in <= ^check_in and b.check_out >= ^check_out)
+                    ),
+              select: b
+            )
+
+          result = Repo.all(query)
+          length(result)
+        _ -> -1
       end
+    _ -> -1
   end
+end
 end
 
